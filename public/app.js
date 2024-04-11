@@ -33,16 +33,16 @@ async function createRoom() {
   const roomRef = await db.collection('rooms').doc();
 
   console.log('Create PeerConnection with configuration: ', configuration);
-  peerConnection = new RTCPeerConnection(configuration);
+  peerConnection = new RTCPeerConnection(configuration); // créer une connection webRTC
 
   registerPeerConnectionListeners();
 
   localStream.getTracks().forEach(track => {
     peerConnection.addTrack(track, localStream);
-  });
+  }); //tracks = stream flux video, pour chacun on envoie a notre peer connection
 
   // Code for collecting ICE candidates below
-  const callerCandidatesCollection = roomRef.collection('callerCandidates');
+  const callerCandidatesCollection = roomRef.collection('callerCandidates'); // ajouter cette connexion à un db (base de donnée)
 
   peerConnection.addEventListener('icecandidate', event => {
     if (!event.candidate) {
@@ -50,7 +50,7 @@ async function createRoom() {
       return;
     }
     console.log('Got candidate: ', event.candidate);
-    callerCandidatesCollection.add(event.candidate.toJSON());
+    callerCandidatesCollection.add(event.candidate.toJSON()); // ajouter le connexion candidate à la db une fois que ya le event 
   });
   // Code for collecting ICE candidates above
 
@@ -89,6 +89,7 @@ async function createRoom() {
       await peerConnection.setRemoteDescription(rtcSessionDescription);
     }
   });
+
   // Listening for remote session description above
 
   // Listen for remote ICE candidates below
